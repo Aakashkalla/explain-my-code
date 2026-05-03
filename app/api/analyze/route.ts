@@ -13,23 +13,30 @@ export async function POST(req : Request){
                         Return STRICT JSON only in this format : 
                         {
                             "explanation" : "brief explanation",
-                            "issues" : ["issue 1", "issue 2"],
+                            "issues" : {
+                                "critical" : ["issue 1"],
+                                "major" : ["issue 2"],
+                                "minor" : ["issue 3"]
+                            }, 
                             "improved_code" : "improved version of code"
                         }
 
                         Rules: 
-                        - Identify CRITICAL issues first : 
-                            - crashes
-                            - security vulnerabilities
-                            - incorrect logic
-                        - Then identify
-                            - performance problems
-                            - scalability limitations
-                            - bad practices
+                        - Classify issues into : 
+                            - "critical" : crashes, security vulnerabilities, incorrect logic that breaks functionality
+                            - "major": important issues that affect performance, scalability, or reliability but do not immediately break the app
+                            - "minor": best practices, code quality improvements, or suggestions
+                        - DO NOT label everything as critical 
+                        - Only mark something as critical if it will break functionality or create a serious security risk.
+                        -If the code is valid and functional:
+                            - "critical" must be an empty array[]
+                            -explicity mention in explanation : "No critical issues found"
+                        - Explain WHY each issue is a problem (briefly, inside each issue line if needed)
+                        - Always include all fields ("critical", "major", "minor") even if empty
+                        - Use empty arrays [] when no issues exist in a category
+                        - Limit each category to maximum 5 issues
                         - DO NOT give generic advice 
                         - Be specific and direct 
-                        - Explain WHY each issue is a problem
-                        - Be direct and critical
                         - Identify real bugs and edge cases 
                         - DO NOT return markdown
                         - DO NOT add extra text outside JSON
