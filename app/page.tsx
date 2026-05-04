@@ -12,12 +12,15 @@ type CodeResponse = {
   improved_code : string
 }
 
+
 export default function Home() {
   const[response, setResponse] = useState<CodeResponse | null>(null);
   const[code, setCode] = useState("");
+  const[copynotif, setCopyNotif] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function codeReviewCall(){
+    setCopyNotif(false);
     setResponse(null);
     setLoading(true);
     const res = await fetch("/api/analyze", {
@@ -41,6 +44,18 @@ export default function Home() {
       console.error("Parsing Failed", data.message);
     }finally{
       setLoading(false)
+    }
+  }
+
+  async function handleCopy(){
+    try{
+      if(response?.improved_code){
+        await navigator.clipboard.writeText(response.improved_code);
+        setCopyNotif(true);
+        setTimeout(()=>setCopyNotif(false),2000);
+      }
+    }catch(e){
+      console.log(e);
     }
   }
 
@@ -108,8 +123,12 @@ export default function Home() {
                   ))}
                 </ul>
               </>)}
-
-            <pre className="bg-neutral-900 text-white p-4 rounded">{response.improved_code}</pre>
+            
+            <div className="relative">
+              <button disabled={!response.improved_code} className="text-white border-white border rounded-lg hover:animate-pulse px-2 py-4 absolute top-2 right-2 cursor-pointer disabled:cursor-not-allowed" onClick={handleCopy}>{copynotif ? "Copied" : "Copy Code"}</button>
+              <pre className="bg-neutral-900 text-white p-4 rounded pt-10">{response.improved_code}</pre>
+            </div>
+            
           </>
         )}
       </div>
