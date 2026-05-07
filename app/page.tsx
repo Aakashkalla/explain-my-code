@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 type CodeResponse = {
   issues : {
@@ -10,41 +12,6 @@ type CodeResponse = {
   },
   explanation : string
   improved_code : string
-}
-
-type DiffLine = {
-  type: "added" | "removed" | "unchanged"
-  line: string
-}
-
-function findDiffing({code, improved_code} : {code: string, improved_code : string}){
-  const diff: DiffLine[] = [];
-  const oldLines = code.split("\n");
-  const newLines = improved_code.split("\n");
-
-  const oldSet = new Set(oldLines);
-  const newSet = new Set(newLines);
-
-  for(const line of newLines){
-    if(line.trim()==="") continue;
-
-    if(!oldSet.has(line)){
-      diff.push({type : "added", line});
-    }else{
-      diff.push({type : "unchanged", line});
-    }
-
-  }
-
-  for (const line of oldLines) {
-    if (line.trim() === "") continue;
-
-    if (!newSet.has(line)) {
-      diff.push({ type: "removed", line });
-    }
-  }
-  
-  return diff;
 }
 
 export default function Home() {
@@ -93,9 +60,6 @@ export default function Home() {
     }
   }
 
-  const diff = response
-  ? findDiffing({ code, improved_code: response.improved_code })
-  : [];
 
   return (
     <main className="min-h-screen bg-white text-neutral-900">
@@ -161,31 +125,12 @@ export default function Home() {
                   ))}
                 </ul>
               </>)}
-            
-            <h2 className="text-lg font-semibold mt-6 mb-2">Changes Preview</h2>
-
-            <div className="bg-neutral-100 rounded p-3 font-mono text-sm whitespace-pre overflow-x-auto">
-              {diff.map((item, i) => (
-                <div
-                  key={i}
-                  className={
-                    item.type === "added"
-                      ? "bg-green-200"
-                      : item.type === "removed"
-                      ? "bg-red-200"
-                      : ""
-                  }
-                >
-                  {item.type === "added" && "+ "}
-                  {item.type === "removed" && "- "}
-                  {item.line}
-                </div>
-              ))}
-            </div>
 
             <div className="relative">
-              <button disabled={!response.improved_code} className="text-white border-white border rounded-lg hover:animate-pulse px-2 py-4 absolute top-2 right-2 cursor-pointer disabled:cursor-not-allowed" onClick={handleCopy}>{copynotif ? "Copied" : "Copy Code"}</button>
-              <pre className="bg-neutral-900 text-white p-4 rounded pt-10">{response.improved_code}</pre>
+              <button disabled={!response.improved_code} className="text-black border-white border rounded-lg hover:animate-pulse px-2 py-4 absolute top-2 right-2 cursor-pointer disabled:cursor-not-allowed" onClick={handleCopy}>{copynotif ? "Copied" : "Copy Code"}</button>
+              <SyntaxHighlighter style={docco} language="javascript" className="bg-neutral-900 text-white p-4 rounded pt-10">
+              {response.improved_code}
+              </SyntaxHighlighter>
             </div>
             
           </>
